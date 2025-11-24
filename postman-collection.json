@@ -1,0 +1,1368 @@
+{
+    "info": {
+        "name": "ProptIQ REST API",
+        "description": "Comprehensive quiz management REST API with authentication, quiz authoring, attempts, analytics, and certificates",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register Student",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"role\": \"student\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/register",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register Teacher",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Teacher Smith\",\n  \"email\": \"teacher@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"role\": \"teacher\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/register",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Register Admin",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"password123\",\n  \"password_confirmation\": \"password123\",\n  \"role\": \"admin\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/register",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save token to environment",
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"token\", jsonData.access_token);",
+                                    "    console.log(\"Token saved:\", jsonData.access_token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"teacher@example.com\",\n  \"password\": \"password123\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/login",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "login"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/me",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "me"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Logout",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/logout",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "logout"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Quizzes",
+            "item": [
+                {
+                    "name": "List Quizzes",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Quiz - Public",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save quiz_id to environment",
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"quiz_id\", jsonData.id);",
+                                    "    console.log(\"Quiz ID saved:\", jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Mathematics Quiz\",\n  \"description\": \"Basic algebra and geometry quiz\",\n  \"type\": \"classic\",\n  \"settings\": {\n    \"time_limit\": 30,\n    \"passing_score\": 70,\n    \"access_mode\": \"public\",\n    \"shuffle_questions\": true,\n    \"show_results\": true\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Quiz - Password Protected",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Science Quiz\",\n  \"description\": \"Physics and Chemistry quiz\",\n  \"type\": \"exam\",\n  \"settings\": {\n    \"time_limit\": 60,\n    \"passing_score\": 80,\n    \"access_mode\": \"password\",\n    \"access_code\": \"SCIENCE2025\",\n    \"shuffle_questions\": true,\n    \"show_results\": false\n  }\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Quiz",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Quiz",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Updated Mathematics Quiz\",\n  \"status\": \"published\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Quiz",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Questions",
+            "item": [
+                {
+                    "name": "Add MCQ Question",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save question_id to environment",
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"question_id\", jsonData.id);",
+                                    "    console.log(\"Question ID saved:\", jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"type\": \"mcq\",\n  \"content\": \"What is 2 + 2?\",\n  \"points\": 10,\n  \"options\": [\n    {\"content\": \"3\", \"is_correct\": false},\n    {\"content\": \"4\", \"is_correct\": true},\n    {\"content\": \"5\", \"is_correct\": false},\n    {\"content\": \"6\", \"is_correct\": false}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/questions",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "questions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Add True/False Question",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"type\": \"true_false\",\n  \"content\": \"The Earth is flat.\",\n  \"points\": 5,\n  \"options\": [\n    {\"content\": \"True\", \"is_correct\": false},\n    {\"content\": \"False\", \"is_correct\": true}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/questions",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "questions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Add Open Question",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"type\": \"open\",\n  \"content\": \"Explain the Pythagorean theorem.\",\n  \"points\": 20\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/questions",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "questions"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Question",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"content\": \"What is 3 + 3?\",\n  \"points\": 15,\n  \"options\": [\n    {\"content\": \"5\", \"is_correct\": false},\n    {\"content\": \"6\", \"is_correct\": true},\n    {\"content\": \"7\", \"is_correct\": false}\n  ]\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/questions/{{question_id}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "questions",
+                                "{{question_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Question",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/questions/{{question_id}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "questions",
+                                "{{question_id}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Quiz Attempts",
+            "item": [
+                {
+                    "name": "Start Quiz (Public)",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save attempt_id to environment",
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"attempt_id\", jsonData.id);",
+                                    "    console.log(\"Attempt ID saved:\", jsonData.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/start",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "start"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Start Quiz (With Password)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"access_code\": \"SCIENCE2025\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/start",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "start"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Submit Answer (MCQ)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"question_id\": 1,\n  \"option_id\": 2\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/attempts/{{attempt_id}}/submit",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "attempts",
+                                "{{attempt_id}}",
+                                "submit"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Submit Answer (Open)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"question_id\": 3,\n  \"answer_content\": \"The Pythagorean theorem states that in a right triangle, the square of the hypotenuse equals the sum of squares of the other two sides: a² + b² = c²\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/attempts/{{attempt_id}}/submit",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "attempts",
+                                "{{attempt_id}}",
+                                "submit"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Finish Attempt",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/attempts/{{attempt_id}}/finish",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "attempts",
+                                "{{attempt_id}}",
+                                "finish"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Analytics & Reports",
+            "item": [
+                {
+                    "name": "Get Leaderboard",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/leaderboard",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "leaderboard"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Quiz Statistics",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/stats",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "stats"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Certificates",
+            "item": [
+                {
+                    "name": "Generate Certificate",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "// Save certificate_code to environment",
+                                    "if (pm.response.code === 201) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"certificate_code\", jsonData.certificate_code);",
+                                    "    console.log(\"Certificate code saved:\", jsonData.certificate_code);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/attempts/{{attempt_id}}/certificate",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "attempts",
+                                "{{attempt_id}}",
+                                "certificate"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Certificate",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/certificates/verify/{{certificate_code}}",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "certificates",
+                                "verify",
+                                "{{certificate_code}}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Webhooks",
+            "item": [
+                {
+                    "name": "List Webhooks",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/webhooks",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "webhooks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Webhook",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"event\": \"quiz.completed\",\n  \"url\": \"https://example.com/webhook\",\n  \"secret\": \"my_secret_key\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/quizzes/{{quiz_id}}/webhooks",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "quizzes",
+                                "{{quiz_id}}",
+                                "webhooks"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Webhook",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/webhooks/1",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "webhooks",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "User Management (Admin)",
+            "item": [
+                {
+                    "name": "List Users",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/users",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "users"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"student\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/users",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "users"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update User",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Updated Name\",\n  \"role\": \"teacher\"\n}"
+                        },
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/users/1",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete User",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "http://127.0.0.1:8000/api/v1/users/1",
+                            "protocol": "http",
+                            "host": [
+                                "127",
+                                "0",
+                                "0",
+                                "1"
+                            ],
+                            "port": "8000",
+                            "path": [
+                                "api",
+                                "v1",
+                                "users",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "quiz_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "question_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "attempt_id",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "certificate_code",
+            "value": "",
+            "type": "string"
+        }
+    ]
+}
