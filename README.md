@@ -7,16 +7,16 @@ A comprehensive, institute-grade online quiz REST API backend built with Laravel
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-orange.svg)](https://mysql.com)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-## 🚀 Features
+## Features
 
 ### Core Functionality
-- ✅ **User Management** - Role-based access control (Admin, Teacher, Student, Guest)
-- ✅ **Quiz Authoring** - Create quizzes with multiple question types
-- ✅ **Access Control** - Public, Private, and Password-protected quizzes
-- ✅ **Quiz Taking** - Real-time answer submission with auto-grading
-- ✅ **Analytics** - Leaderboards, statistics, and performance reports
-- ✅ **Certificates** - Auto-generate certificates for passing students
-- ✅ **Webhooks** - Event-driven integrations
+- **User Management** - Role-based access control (Admin, Teacher, Student, Guest)
+- **Quiz Authoring** - Create quizzes with multiple question types
+- **Access Control** - Public, Private, and Password-protected quizzes
+- **Quiz Taking** - Real-time answer submission with auto-grading
+- **Analytics** - Leaderboards, statistics, and performance reports
+- **Certificates** - Auto-generate certificates for passing students
+- **Webhooks** - Event-driven integrations
 
 ### Question Types Supported
 - Multiple Choice (MCQ)
@@ -35,7 +35,7 @@ A comprehensive, institute-grade online quiz REST API backend built with Laravel
 - Group-based access
 - Soft deletes for data preservation
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Installation](#installation)
 - [Configuration](#configuration)
@@ -46,7 +46,7 @@ A comprehensive, institute-grade online quiz REST API backend built with Laravel
 - [Contributing](#contributing)
 - [License](#license)
 
-## 🛠️ Installation
+## Installation
 
 ### Prerequisites
 - PHP 8.1 or higher
@@ -56,8 +56,8 @@ A comprehensive, institute-grade online quiz REST API backend built with Laravel
 
 ### Step 1: Clone Repository
 ```bash
-git clone https://github.com/EIRSVi/ProptIQ.git
-cd ProptIQ
+git clone https://github.com/EIRSVi/prop-iq.git
+cd prop-iq
 ```
 
 ### Step 2: Install Dependencies
@@ -94,7 +94,7 @@ php artisan serve
 
 The API will be available at `http://127.0.0.1:8000/api/v1`
 
-## ⚙️ Configuration
+## Configuration
 
 ### Authentication
 ProptIQ uses Laravel Sanctum for API token authentication.
@@ -109,7 +109,7 @@ php artisan install:api
 - **Student** - Take quizzes and view results
 - **Guest** - Limited access to public quizzes
 
-## 📚 API Documentation
+## API Documentation
 
 ### Base URL
 ```
@@ -243,9 +243,9 @@ Authorization: Bearer {token}
 ```
 
 ### Complete API Documentation
-For complete API documentation, see [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
+For complete API documentation with all endpoints, request/response examples, and error codes, see [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 
-## 🗄️ Database Schema
+## Database Schema
 
 ### Core Tables
 - `users` - User accounts with roles
@@ -259,20 +259,19 @@ For complete API documentation, see [API_DOCUMENTATION.md](API_DOCUMENTATION.md)
 - `webhooks` - Webhook configurations
 - `groups` - User groups/classes
 
-For detailed schema documentation, see [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)
+### Entity Relationship Diagram
+For a detailed visual representation of the database structure with all relationships, see [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)
 
-## 🧪 Testing
+The schema includes a comprehensive Mermaid ER diagram showing all table relationships, field types, and cardinality.
+
+## Testing
 
 ### Using Postman
 1. Import `postman-collection.json`
-2. Set environment variables
-3. Run the collection
+2. The collection includes auto-save scripts for tokens and IDs
+3. Follow the testing workflow in `POSTMAN_SETUP.md`
 
-### Using Hoppscotch
-1. Import `hoppscotch-collection.json`
-2. Follow setup guide in `HOPPSCOTCH_SETUP.md`
-
-### Manual Testing
+### Manual Testing with cURL
 ```bash
 # Register a teacher
 curl -X POST http://127.0.0.1:8000/api/v1/register \
@@ -286,7 +285,12 @@ curl -X POST http://127.0.0.1:8000/api/v1/register \
   }'
 ```
 
-## 📊 Project Structure
+### Run Tests
+```bash
+php artisan test
+```
+
+## Project Structure
 
 ```
 ProptIQ/
@@ -322,14 +326,13 @@ ProptIQ/
 │   └── migrations/
 ├── routes/
 │   └── api.php
-├── API_DOCUMENTATION.md
 ├── DATABASE_SCHEMA.md
 ├── POSTMAN_SETUP.md
 ├── postman-collection.json
 └── README.md
 ```
 
-## 🚢 Deployment
+## Deployment
 
 ### Production Checklist
 - [ ] Set `APP_ENV=production` in `.env`
@@ -359,7 +362,7 @@ DB_USERNAME=your-username
 DB_PASSWORD=your-password
 ```
 
-## 🔒 Security
+## Security
 
 - Token-based authentication (Laravel Sanctum)
 - Role-based access control (RBAC)
@@ -369,7 +372,7 @@ DB_PASSWORD=your-password
 - Rate limiting
 - Input validation
 
-## 📈 Performance
+## Performance
 
 - Database indexing on foreign keys
 - Eager loading relationships
@@ -377,7 +380,54 @@ DB_PASSWORD=your-password
 - Query optimization
 - Caching opportunities (Redis/Memcached)
 
-## 🤝 Contributing
+## API Endpoints Summary
+
+### Authentication (4 endpoints)
+- POST `/api/v1/register`
+- POST `/api/v1/login`
+- POST `/api/v1/logout`
+- GET `/api/v1/me`
+
+### Quizzes (5 endpoints)
+- GET `/api/v1/quizzes`
+- POST `/api/v1/quizzes`
+- GET `/api/v1/quizzes/{quiz}`
+- PUT `/api/v1/quizzes/{quiz}`
+- DELETE `/api/v1/quizzes/{quiz}`
+
+### Questions (3 endpoints)
+- POST `/api/v1/quizzes/{quiz}/questions`
+- PUT `/api/v1/questions/{question}`
+- DELETE `/api/v1/questions/{question}`
+
+### Attempts (3 endpoints)
+- POST `/api/v1/quizzes/{quiz}/start`
+- POST `/api/v1/attempts/{attempt}/submit`
+- POST `/api/v1/attempts/{attempt}/finish`
+
+### Analytics (2 endpoints)
+- GET `/api/v1/quizzes/{quiz}/leaderboard`
+- GET `/api/v1/quizzes/{quiz}/stats`
+
+### Certificates (2 endpoints)
+- POST `/api/v1/attempts/{attempt}/certificate`
+- GET `/api/v1/certificates/verify/{code}`
+
+### Webhooks (3 endpoints)
+- GET `/api/v1/quizzes/{quiz}/webhooks`
+- POST `/api/v1/quizzes/{quiz}/webhooks`
+- DELETE `/api/v1/webhooks/{webhook}`
+
+### Users - Admin (5 endpoints)
+- GET `/api/v1/users`
+- POST `/api/v1/users`
+- GET `/api/v1/users/{user}`
+- PUT `/api/v1/users/{user}`
+- DELETE `/api/v1/users/{user}`
+
+**Total: 27 API Endpoints**
+
+## Contributing
 
 Contributions are welcome! Please follow these steps:
 
@@ -387,29 +437,29 @@ Contributions are welcome! Please follow these steps:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
+## Authors
 
 - **EIRSVi** - [GitHub](https://github.com/EIRSVi)
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Laravel Framework
 - Laravel Sanctum
 - MySQL
-- Postman/Hoppscotch
+- Postman
 
-## 📞 Support
+## Support
 
 For issues and questions:
 - Create an issue on GitHub
 - Check the documentation files
 - Review Laravel logs: `storage/logs/laravel.log`
 
-## 🗺️ Roadmap
+## Roadmap
 
 - [ ] Email notifications (SMTP integration)
 - [ ] PDF/Excel export for reports
@@ -420,7 +470,7 @@ For issues and questions:
 - [ ] LMS integration (Moodle, Canvas)
 - [ ] Mobile app support
 
-## 📊 Statistics
+## Statistics
 
 - **27 API Endpoints**
 - **13 Database Tables**
@@ -431,4 +481,4 @@ For issues and questions:
 
 ---
 
-**Built with ❤️ using Laravel**
+Built with Laravel
