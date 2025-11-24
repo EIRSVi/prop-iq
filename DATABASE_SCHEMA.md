@@ -1,26 +1,173 @@
 # ProptIQ Database Schema
 
-## Entity Relationship Overview
+## Entity Relationship Diagram
 
+```mermaid
+erDiagram
+    USERS ||--o{ GROUPS : owns
+    USERS ||--o{ QUIZZES : authors
+    USERS ||--o{ QUIZ_ATTEMPTS : takes
+    USERS ||--o{ CERTIFICATES : receives
+    USERS }o--o{ GROUPS : "belongs to"
+    
+    GROUPS ||--o{ GROUP_USER : has
+    GROUPS }o--o{ QUIZZES : "can access"
+    
+    QUIZZES ||--|| QUIZ_SETTINGS : has
+    QUIZZES ||--o{ QUESTIONS : contains
+    QUIZZES ||--o{ QUIZ_ATTEMPTS : "attempted by"
+    QUIZZES ||--o{ WEBHOOKS : triggers
+    QUIZZES ||--o{ CERTIFICATES : "issues for"
+    QUIZZES ||--o{ QUIZ_GROUPS : "assigned to"
+    
+    QUESTIONS ||--o{ QUESTION_OPTIONS : has
+    QUESTIONS ||--o{ QUESTION_ANSWERS : "answered in"
+    
+    QUIZ_ATTEMPTS ||--o{ QUESTION_ANSWERS : contains
+    QUIZ_ATTEMPTS ||--o| CERTIFICATES : "may generate"
+    
+    USERS {
+        bigint id PK
+        string name
+        string email UK
+        string password
+        string role
+        timestamp email_verified_at
+        timestamp created_at
+    }
+    
+    GROUPS {
+        bigint id PK
+        string name
+        bigint owner_id FK
+        timestamp created_at
+    }
+    
+    GROUP_USER {
+        bigint id PK
+        bigint group_id FK
+        bigint user_id FK
+        timestamp created_at
+    }
+    
+    QUIZZES {
+        bigint id PK
+        string title
+        text description
+        string slug UK
+        bigint author_id FK
+        string status
+        string type
+        timestamp created_at
+        timestamp deleted_at
+    }
+    
+    QUIZ_SETTINGS {
+        bigint id PK
+        bigint quiz_id FK
+        int time_limit
+        int passing_score
+        boolean shuffle_questions
+        boolean show_results
+        string access_mode
+        string access_code
+        timestamp start_at
+        timestamp end_at
+    }
+    
+    QUESTIONS {
+        bigint id PK
+        bigint quiz_id FK
+        string type
+        text content
+        string media_url
+        int points
+        int order
+        timestamp created_at
+    }
+    
+    QUESTION_OPTIONS {
+        bigint id PK
+        bigint question_id FK
+        text content
+        boolean is_correct
+        int order
+        timestamp created_at
+    }
+    
+    QUIZ_ATTEMPTS {
+        bigint id PK
+        bigint quiz_id FK
+        bigint user_id FK
+        timestamp start_time
+        timestamp end_time
+        decimal score
+        string status
+        timestamp created_at
+    }
+    
+    QUESTION_ANSWERS {
+        bigint id PK
+        bigint attempt_id FK
+        bigint question_id FK
+        text answer_content
+        bigint option_id FK
+        boolean is_correct
+        decimal points_awarded
+        timestamp created_at
+    }
+    
+    CERTIFICATES {
+        bigint id PK
+        bigint attempt_id FK
+        bigint user_id FK
+        bigint quiz_id FK
+        string certificate_code UK
+        decimal score
+        timestamp issued_at
+        timestamp created_at
+    }
+    
+    WEBHOOKS {
+        bigint id PK
+        bigint quiz_id FK
+        string event
+        string url
+        string secret
+        boolean is_active
+        timestamp created_at
+    }
+    
+    QUIZ_GROUPS {
+        bigint id PK
+        bigint quiz_id FK
+        bigint group_id FK
+        timestamp created_at
+    }
 ```
-Users ──┬─── Groups (many-to-many)
-        ├─── Quizzes (author)
-        ├─── Quiz Attempts
-        └─── Certificates
 
-Quizzes ─┬─── Quiz Settings (one-to-one)
-         ├─── Questions (one-to-many)
-         ├─── Quiz Attempts (one-to-many)
-         ├─── Webhooks (one-to-many)
-         ├─── Certificates (one-to-many)
-         └─── Groups (many-to-many via quiz_groups)
+## Relationship Summary
 
-Questions ─┬─── Question Options (one-to-many)
-           └─── Question Answers (one-to-many)
+### One-to-Many Relationships
+- **User** → Groups (as owner)
+- **User** → Quizzes (as author)
+- **User** → Quiz Attempts
+- **User** → Certificates
+- **Quiz** → Questions
+- **Quiz** → Quiz Attempts
+- **Quiz** → Webhooks
+- **Quiz** → Certificates
+- **Question** → Question Options
+- **Question** → Question Answers
+- **Quiz Attempt** → Question Answers
 
-Quiz Attempts ─┬─── Question Answers (one-to-many)
-               └─── Certificates (one-to-one)
-```
+### One-to-One Relationships
+- **Quiz** ↔ Quiz Settings
+- **Quiz Attempt** ↔ Certificate (optional)
+
+### Many-to-Many Relationships
+- **User** ↔ Groups (via group_user)
+- **Quiz** ↔ Groups (via quiz_groups)
 
 ---
 
