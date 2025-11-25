@@ -956,365 +956,215 @@ Authorization: Bearer {admin_token}
 ### Authentication Flow
 
 ```mermaid
-sequenceDiagram
-    participant Client
-    participant API
-    participant AuthController
-    participant User Model
-    participant Database
-    participant Sanctum
-    
-    Note over Client,Sanctum: User Registration
-    Client->>API: POST /api/v1/register
-    API->>AuthController: register(request)
-    AuthController->>AuthController: Validate input
-    AuthController->>User Model: Create user
-    User Model->>Database: INSERT INTO users
-    Database-->>User Model: User created
-    User Model-->>AuthController: User object
-    AuthController->>Sanctum: createToken('auth_token')
-    Sanctum-->>AuthController: Token
-    AuthController-->>Client: 201 {access_token, user}
-    
-    Note over Client,Sanctum: User Login
-    Client->>API: POST /api/v1/login
-    API->>AuthController: login(request)
-    AuthController->>AuthController: Attempt authentication
-    AuthController->>Database: SELECT * FROM users WHERE email
-    Database-->>AuthController: User record
-    AuthController->>AuthController: Verify password (bcrypt)
-    alt Valid credentials
-        AuthController->>Sanctum: createToken('auth_token')
-        Sanctum-->>AuthController: Token
-        AuthController-->>Client: 200 {access_token, user}
-    else Invalid credentials
-        AuthController-->>Client: 401 {message: "Invalid login details"}
+graph TB
+    subgraph "User Registration"
+        RegStart["POST /api/v1/register"] --> RegValidate["Validate Input<br/>name, email, password"]
+        RegValidate --> RegCreate["Create User<br/>Hash Password"]
+        RegCreate --> RegDB["Save to Database<br/>users table"]
+        RegDB --> RegToken["Generate Token<br/>Sanctum"]
+        RegToken --> RegResponse["201 Created<br/>{access_token, user}"]
     end
     
-    Note over Client,Sanctum: Authenticated Request
-    Client->>API: GET /api/v1/me (Bearer token)
-    API->>Sanctum: Verify token
-    Sanctum->>Database: SELECT * FROM personal_access_tokens
-    Database-->>Sanctum: Token valid
-    Sanctum-->>API: User authenticated
-    API->>AuthController: me(request)
-    AuthController-->>Client: 200 {user}
+    subgraph "User Login"
+        LoginStart["POST /api/v1/login"] --> LoginAuth["Verify Credentials<br/>email + password"]
+        LoginAuth -->|Valid| LoginToken["Generate Token<br/>Sanctum"]
+        LoginAuth -->|Invalid| LoginError["401 Unauthorized<br/>Invalid login details"]
+        LoginToken --> LoginResponse["200 OK<br/>{access_token, user}"]
+    end
     
-    Note over Client,Sanctum: Logout
-    Client->>API: POST /api/v1/logout (Bearer token)
-    API->>Sanctum: Verify token
-    Sanctum-->>API: User authenticated
-    API->>AuthController: logout(request)
-    AuthController->>Database: DELETE FROM personal_access_tokens
-    Database-->>AuthController: Token deleted
-    AuthController-->>Client: 200 {message: "Logged out successfully"}
+    subgraph "Authenticated Request"
+        AuthReq["GET /api/v1/me<br/>Bearer token"] --> VerifyToken["Verify Token<br/>Sanctum Middleware"]
+        VerifyToken -->|Valid| GetUser["Fetch User Data"]
+        VerifyToken -->|Invalid| AuthError["401 Unauthorized"]
+        GetUser --> AuthResponse["200 OK<br/>{user}"]
+    end
+    
+    subgraph "Logout"
+        LogoutReq["POST /api/v1/logout<br/>Bearer token"] --> LogoutVerify["Verify Token"]
+        LogoutVerify --> LogoutDelete["Delete Token<br/>personal_access_tokens"]
+        LogoutDelete --> LogoutResponse["200 OK<br/>Logged out successfully"]
+    end
+    
+    style RegResponse fill:#90EE90
+    style LoginResponse fill:#90EE90
+    style AuthResponse fill:#90EE90
+    style LogoutResponse fill:#90EE90
+    style LoginError fill:#FFB6C1
+    style AuthError fill:#FFB6C1
 ```
 
 ### Quiz Creation Flow
 
 ```mermaid
-sequenceDiagram
-    participant Teacher
-    participant API
-    participant QuizController
-    participant QuizService
-    participant Quiz Model
-    participant QuizSettings Model
-    participant Question Model
-    participant QuestionOption Model
-    participant Database
+graph TB
+    Start["Teacher: POST /api/v1/quizzes"] --> Auth["Verify Auth Token<br/>Sanctum"]
+    Auth --> Validate["Validate Quiz Data<br/>title, type, settings"]
+    Validate --> CreateQuiz["QuizService<br/>Create Quiz"]
+    CreateQuiz --> SaveQuiz["Database<br/>INSERT INTO quizzes"]
+    SaveQuiz --> GenSlug["Generate Unique Slug"]
+    GenSlug --> CreateSettings["Create Quiz Settings<br/>time_limit, passing_score"]
+    CreateSettings --> SaveSettings["Database<br/>INSERT INTO quiz_settings"]
+    SaveSettings --> QuizResponse["201 Created<br/>{quiz, settings}"]
     
-    Note over Teacher,Database: Create Quiz
-    Teacher->>API: POST /api/v1/quizzes
-    API->>API: Verify auth token
-    API->>QuizController: store(request)
-    QuizController->>QuizController: Validate input
-    QuizController->>QuizService: createQuiz(data, user_id)
-    QuizService->>Quiz Model: Create quiz
-    Quiz Model->>Database: INSERT INTO quizzes
-    Database-->>Quiz Model: Quiz created (id=1)
-    QuizService->>QuizService: Generate slug
-    QuizService->>QuizSettings Model: Create settings
-    QuizSettings Model->>Database: INSERT INTO quiz_settings
-    Database-->>QuizSettings Model: Settings created
-    QuizService-->>QuizController: Quiz with settings
-    QuizController-->>Teacher: 201 {quiz, settings}
+    QuizResponse --> AddQ1["Teacher: POST /api/v1/quizzes/1/questions"]
+    AddQ1 --> ValidateQ1["Validate Question Data<br/>type, content, points"]
+    ValidateQ1 --> CreateQ1["Create Question"]
+    CreateQ1 --> SaveQ1["Database<br/>INSERT INTO questions"]
+    SaveQ1 --> CreateOpts["Create Options<br/>Loop through options"]
+    CreateOpts --> SaveOpts["Database<br/>INSERT INTO question_options"]
+    SaveOpts --> Q1Response["201 Created<br/>{question, options}"]
     
-    Note over Teacher,Database: Add Question 1
-    Teacher->>API: POST /api/v1/quizzes/1/questions
-    API->>QuizController: QuestionController.store(quiz_id)
-    QuizController->>QuizController: Validate question data
-    QuizController->>Question Model: Create question
-    Question Model->>Database: INSERT INTO questions
-    Database-->>Question Model: Question created (id=1)
+    Q1Response --> AddQ2["Teacher: Add More Questions"]
+    AddQ2 --> Q2Response["201 Created<br/>{question, options}"]
     
-    loop For each option
-        QuizController->>QuestionOption Model: Create option
-        QuestionOption Model->>Database: INSERT INTO question_options
-        Database-->>QuestionOption Model: Option created
-    end
+    Q2Response --> Publish["Teacher: PUT /api/v1/quizzes/1<br/>status=published"]
+    Publish --> AuthCheck["Authorize<br/>Owner or Admin"]
+    AuthCheck -->|Authorized| UpdateStatus["Database<br/>UPDATE quizzes<br/>SET status='published'"]
+    AuthCheck -->|Unauthorized| Error403["403 Forbidden"]
+    UpdateStatus --> PublishResponse["200 OK<br/>{quiz}"]
     
-    QuizController-->>Teacher: 201 {question, options}
-    
-    Note over Teacher,Database: Add Question 2
-    Teacher->>API: POST /api/v1/quizzes/1/questions
-    API->>QuizController: QuestionController.store(quiz_id)
-    QuizController->>Question Model: Create question
-    Question Model->>Database: INSERT INTO questions
-    Database-->>Question Model: Question created (id=2)
-    QuizController-->>Teacher: 201 {question, options}
-    
-    Note over Teacher,Database: Publish Quiz
-    Teacher->>API: PUT /api/v1/quizzes/1
-    API->>QuizController: update(quiz_id)
-    QuizController->>QuizController: Authorize (owner/admin)
-    QuizController->>Quiz Model: Update status='published'
-    Quiz Model->>Database: UPDATE quizzes SET status='published'
-    Database-->>Quiz Model: Updated
-    QuizController-->>Teacher: 200 {quiz}
+    style QuizResponse fill:#90EE90
+    style Q1Response fill:#90EE90
+    style Q2Response fill:#90EE90
+    style PublishResponse fill:#90EE90
+    style Error403 fill:#FFB6C1
 ```
 
 ### Quiz Taking Flow
 
 ```mermaid
-sequenceDiagram
-    participant Student
-    participant API
-    participant AttemptController
-    participant GradingService
-    participant QuizAttempt Model
-    participant QuestionAnswer Model
-    participant Database
+graph TB
+    Start["Student: POST /api/v1/quizzes/1/start"] --> Auth["Verify Auth Token"]
+    Auth --> LoadQuiz["Load Quiz Data<br/>quizzes + quiz_settings"]
+    LoadQuiz --> CheckStatus["Check Quiz Status<br/>published?"]
+    CheckStatus --> CheckDates["Check Dates<br/>start_at, end_at"]
+    CheckDates --> CheckAccess["Check Access Mode<br/>public/private/password"]
     
-    Note over Student,Database: Start Quiz
-    Student->>API: POST /api/v1/quizzes/1/start
-    API->>API: Verify auth token
-    API->>AttemptController: start(quiz_id)
-    AttemptController->>Database: SELECT * FROM quizzes WHERE id=1
-    Database-->>AttemptController: Quiz data
-    AttemptController->>Database: SELECT * FROM quiz_settings WHERE quiz_id=1
-    Database-->>AttemptController: Settings data
+    CheckAccess -->|Access Denied| Error403["403/404<br/>Access Denied"]
+    CheckAccess -->|Access Granted| CreateAttempt["Create Quiz Attempt<br/>status=in_progress"]
+    CreateAttempt --> SaveAttempt["Database<br/>INSERT INTO quiz_attempts"]
+    SaveAttempt --> StartResponse["201 Created<br/>{attempt_id, start_time}"]
     
-    AttemptController->>AttemptController: Check quiz status='published'
-    AttemptController->>AttemptController: Check start_at/end_at dates
-    AttemptController->>AttemptController: Check access_mode
+    StartResponse --> SubmitA1["Student: POST /api/v1/attempts/1/submit<br/>question_id, option_id"]
+    SubmitA1 --> VerifyAttempt["Verify Ownership<br/>& Status"]
+    VerifyAttempt --> ValidateQ["Validate Question<br/>belongs to quiz"]
+    ValidateQ --> SaveAnswer1["Database<br/>INSERT/UPDATE question_answers"]
+    SaveAnswer1 --> Answer1Response["200 OK<br/>{answer}"]
     
-    alt Access denied
-        AttemptController-->>Student: 403/404 {message}
-    else Access granted
-        AttemptController->>QuizAttempt Model: Create attempt
-        QuizAttempt Model->>Database: INSERT INTO quiz_attempts
-        Database-->>QuizAttempt Model: Attempt created (id=1)
-        AttemptController-->>Student: 201 {attempt_id, start_time, status}
-    end
+    Answer1Response --> SubmitA2["Student: Submit More Answers"]
+    SubmitA2 --> SaveAnswer2["Database<br/>UPDATE question_answers"]
+    SaveAnswer2 --> Answer2Response["200 OK"]
     
-    Note over Student,Database: Submit Answer 1
-    Student->>API: POST /api/v1/attempts/1/submit
-    API->>AttemptController: submitAnswer(attempt_id)
-    AttemptController->>AttemptController: Verify user owns attempt
-    AttemptController->>AttemptController: Verify status='in_progress'
-    AttemptController->>AttemptController: Validate question belongs to quiz
-    AttemptController->>QuestionAnswer Model: updateOrCreate answer
-    QuestionAnswer Model->>Database: INSERT/UPDATE question_answers
-    Database-->>QuestionAnswer Model: Answer saved
-    AttemptController-->>Student: 200 {answer}
+    Answer2Response --> Finish["Student: POST /api/v1/attempts/1/finish"]
+    Finish --> SetEndTime["Set end_time=now()"]
+    SetEndTime --> StartGrading["GradingService<br/>calculateScore()"]
+    StartGrading --> LoadAnswers["Load All Answers<br/>with Questions"]
+    LoadAnswers --> CheckCorrect["Check Each Answer<br/>is_correct?"]
+    CheckCorrect --> CalcPoints["Calculate Points<br/>points_awarded"]
+    CalcPoints --> UpdateAnswers["Database<br/>UPDATE question_answers"]
+    UpdateAnswers --> SumScore["Sum Total Score"]
+    SumScore --> UpdateAttempt["Database<br/>UPDATE quiz_attempts<br/>score, status=completed"]
+    UpdateAttempt --> FinishResponse["200 OK<br/>{score, status=completed}"]
     
-    Note over Student,Database: Submit Answer 2
-    Student->>API: POST /api/v1/attempts/1/submit
-    API->>AttemptController: submitAnswer(attempt_id)
-    AttemptController->>QuestionAnswer Model: updateOrCreate answer
-    QuestionAnswer Model->>Database: INSERT/UPDATE question_answers
-    Database-->>QuestionAnswer Model: Answer saved
-    AttemptController-->>Student: 200 {answer}
-    
-    Note over Student,Database: Finish Quiz
-    Student->>API: POST /api/v1/attempts/1/finish
-    API->>AttemptController: finish(attempt_id)
-    AttemptController->>AttemptController: Verify user owns attempt
-    AttemptController->>QuizAttempt Model: Set end_time=now()
-    QuizAttempt Model->>Database: UPDATE quiz_attempts SET end_time
-    Database-->>QuizAttempt Model: Updated
-    
-    AttemptController->>GradingService: calculateScore(attempt)
-    GradingService->>Database: SELECT answers with questions
-    Database-->>GradingService: All answers
-    
-    loop For each answer
-        GradingService->>GradingService: Check if option.is_correct
-        GradingService->>GradingService: Calculate points_awarded
-        GradingService->>Database: UPDATE question_answers
-        Database-->>GradingService: Updated
-    end
-    
-    GradingService->>GradingService: Sum total score
-    GradingService->>Database: UPDATE quiz_attempts SET score, status='completed'
-    Database-->>GradingService: Updated
-    GradingService-->>AttemptController: Graded attempt
-    AttemptController-->>Student: 200 {attempt_id, score, status='completed'}
+    style StartResponse fill:#90EE90
+    style Answer1Response fill:#90EE90
+    style Answer2Response fill:#90EE90
+    style FinishResponse fill:#90EE90
+    style Error403 fill:#FFB6C1
 ```
 
 ### Certificate Generation Flow
 
 ```mermaid
-sequenceDiagram
-    participant Student
-    participant API
-    participant CertificateController
-    participant CertificateService
-    participant Certificate Model
-    participant Database
+graph TB
+    Start["Student: POST /api/v1/attempts/1/certificate"] --> VerifyAuth["Verify Auth Token"]
+    VerifyAuth --> LoadAttempt["Load Quiz Attempt<br/>from Database"]
+    LoadAttempt --> CheckOwner["Verify User<br/>Owns Attempt"]
+    CheckOwner --> CheckComplete["Check Status<br/>completed?"]
     
-    Note over Student,Database: Request Certificate
-    Student->>API: POST /api/v1/attempts/1/certificate
-    API->>API: Verify auth token
-    API->>CertificateController: generate(attempt_id)
-    CertificateController->>Database: SELECT * FROM quiz_attempts WHERE id=1
-    Database-->>CertificateController: Attempt data
+    CheckComplete -->|Not Completed| Error400A["400 Bad Request<br/>Quiz not completed"]
+    CheckComplete -->|Completed| CheckExisting["Check Existing<br/>Certificate"]
     
-    CertificateController->>CertificateController: Verify user owns attempt
-    CertificateController->>CertificateController: Check status='completed'
+    CheckExisting -->|Exists| ReturnExisting["200 OK<br/>{existing certificate}"]
+    CheckExisting -->|Not Exists| LoadSettings["Load Quiz Settings<br/>passing_score"]
     
-    alt Not completed
-        CertificateController-->>Student: 400 {message: "Quiz not completed"}
-    else Completed
-        CertificateController->>Database: SELECT * FROM certificates WHERE attempt_id=1
-        Database-->>CertificateController: Check existing
-        
-        alt Certificate exists
-            CertificateController-->>Student: 200 {existing certificate}
-        else No certificate
-            CertificateController->>CertificateService: generateCertificate(attempt)
-            CertificateService->>Database: SELECT quiz_settings
-            Database-->>CertificateService: Settings (passing_score=70)
-            
-            CertificateService->>CertificateService: Check score >= passing_score
-            
-            alt Score too low
-                CertificateService-->>CertificateController: null
-                CertificateController-->>Student: 400 {message: "Did not meet passing criteria"}
-            else Score sufficient
-                CertificateService->>CertificateService: Generate unique code
-                CertificateService->>Certificate Model: Create certificate
-                Certificate Model->>Database: INSERT INTO certificates
-                Database-->>Certificate Model: Certificate created
-                CertificateService-->>CertificateController: Certificate
-                CertificateController-->>Student: 201 {certificate_code, score, issued_at}
-            end
-        end
-    end
+    LoadSettings --> CompareScore["Compare Score<br/>score >= passing_score?"]
+    CompareScore -->|Failed| Error400B["400 Bad Request<br/>Did not meet passing criteria"]
+    CompareScore -->|Passed| GenCode["Generate Unique Code<br/>CERT-XXXXXX"]
     
-    Note over Student,Database: Verify Certificate
-    Student->>API: GET /api/v1/certificates/verify/CERT-ABC123
-    API->>CertificateController: verify(code)
-    CertificateController->>Database: SELECT * FROM certificates WHERE certificate_code
-    Database-->>CertificateController: Certificate with user, quiz
+    GenCode --> CreateCert["Create Certificate<br/>CertificateService"]
+    CreateCert --> SaveCert["Database<br/>INSERT INTO certificates"]
+    SaveCert --> CertResponse["201 Created<br/>{certificate_code, score, issued_at}"]
     
-    alt Not found
-        CertificateController-->>Student: 404 {message: "Certificate not found"}
-    else Found
-        CertificateController-->>Student: 200 {certificate, user, quiz}
-    end
+    CertResponse --> Verify["Anyone: GET /api/v1/certificates/verify/CODE"]
+    Verify --> SearchCert["Database<br/>SELECT certificate<br/>WHERE certificate_code"]
+    SearchCert -->|Not Found| Error404["404 Not Found<br/>Certificate not found"]
+    SearchCert -->|Found| VerifyResponse["200 OK<br/>{certificate, user, quiz}"]
+    
+    style ReturnExisting fill:#87CEEB
+    style CertResponse fill:#90EE90
+    style VerifyResponse fill:#90EE90
+    style Error400A fill:#FFB6C1
+    style Error400B fill:#FFB6C1
+    style Error404 fill:#FFB6C1
 ```
 
 ### Leaderboard & Analytics Flow
 
 ```mermaid
-sequenceDiagram
-    participant User
-    participant API
-    participant LeaderboardController
-    participant ReportController
-    participant Database
-    
-    Note over User,Database: Get Leaderboard
-    User->>API: GET /api/v1/quizzes/1/leaderboard
-    API->>API: Verify auth token
-    API->>LeaderboardController: index(quiz_id)
-    LeaderboardController->>Database: SELECT quiz with settings
-    Database-->>LeaderboardController: Quiz data
-    
-    LeaderboardController->>LeaderboardController: Check show_results permission
-    
-    alt Results hidden
-        LeaderboardController-->>User: 403 {message: "Leaderboard hidden"}
-    else Results visible
-        LeaderboardController->>Database: SELECT * FROM quiz_attempts<br/>WHERE quiz_id=1 AND status='completed'<br/>ORDER BY score DESC, end_time ASC
-        Database-->>LeaderboardController: Attempts with users
-        
-        loop For each attempt
-            LeaderboardController->>LeaderboardController: Map to {user, score, completed_at}
-            LeaderboardController->>LeaderboardController: Assign rank
-        end
-        
-        LeaderboardController-->>User: 200 [{rank, user, score, completed_at}]
+graph TB
+    subgraph "Leaderboard"
+        LB1["User: GET /api/v1/quizzes/1/leaderboard"] --> LB2["Verify Auth Token"]
+        LB2 --> LB3["Load Quiz Settings<br/>show_results"]
+        LB3 -->|Hidden| LB4["403 Forbidden<br/>Leaderboard hidden"]
+        LB3 -->|Visible| LB5["Database<br/>SELECT quiz_attempts<br/>WHERE status=completed<br/>ORDER BY score DESC"]
+        LB5 --> LB6["Map Each Attempt<br/>user, score, completed_at"]
+        LB6 --> LB7["Assign Ranks<br/>1, 2, 3..."]
+        LB7 --> LB8["200 OK<br/>{rank, user, score, completed_at}"]
     end
     
-    Note over User,Database: Get Quiz Statistics
-    User->>API: GET /api/v1/quizzes/1/stats
-    API->>ReportController: quizStatistics(quiz_id)
-    ReportController->>ReportController: Authorize (author/admin only)
-    
-    alt Unauthorized
-        ReportController-->>User: 403 {message: "Unauthorized"}
-    else Authorized
-        ReportController->>Database: SELECT * FROM quiz_attempts<br/>WHERE quiz_id=1 AND status='completed'
-        Database-->>ReportController: All completed attempts
-        
-        ReportController->>ReportController: Calculate total_attempts
-        ReportController->>ReportController: Calculate avg(score)
-        ReportController->>ReportController: Calculate max(score)
-        ReportController->>ReportController: Calculate min(score)
-        
-        ReportController->>Database: SELECT passing_score FROM quiz_settings
-        Database-->>ReportController: passing_score=70
-        
-        ReportController->>ReportController: Count attempts WHERE score >= 70
-        ReportController->>ReportController: Calculate pass_rate percentage
-        
-        ReportController-->>User: 200 {total_attempts, average_score,<br/>highest_score, lowest_score, pass_rate}
+    subgraph "Quiz Statistics"
+        ST1["Teacher/Admin: GET /api/v1/quizzes/1/stats"] --> ST2["Verify Auth Token"]
+        ST2 --> ST3["Authorize<br/>Author or Admin?"]
+        ST3 -->|Unauthorized| ST4["403 Forbidden<br/>Unauthorized"]
+        ST3 -->|Authorized| ST5["Database<br/>SELECT quiz_attempts<br/>WHERE status=completed"]
+        ST5 --> ST6["Calculate Statistics<br/>total, avg, max, min"]
+        ST6 --> ST7["Load passing_score<br/>from quiz_settings"]
+        ST7 --> ST8["Count Passed Attempts<br/>score >= passing_score"]
+        ST8 --> ST9["Calculate Pass Rate<br/>percentage"]
+        ST9 --> ST10["200 OK<br/>{total_attempts, average_score,<br/>highest_score, lowest_score, pass_rate}"]
     end
+    
+    style LB8 fill:#90EE90
+    style ST10 fill:#90EE90
+    style LB4 fill:#FFB6C1
+    style ST4 fill:#FFB6C1
 ```
 
 ### Webhook Flow
 
 ```mermaid
-sequenceDiagram
-    participant Student
-    participant AttemptController
-    participant GradingService
-    participant Database
-    participant WebhookService
-    participant External System
+graph TB
+    Start["Student: POST /api/v1/attempts/1/finish"] --> Grade["GradingService<br/>calculateScore()"]
+    Grade --> UpdateDB["Database<br/>UPDATE quiz_attempts<br/>SET status=completed, score"]
+    UpdateDB --> LoadWebhooks["Database<br/>SELECT webhooks<br/>WHERE quiz_id AND event=quiz.completed<br/>AND is_active=true"]
     
-    Note over Student,External System: Quiz Completion with Webhook
-    Student->>AttemptController: POST /api/v1/attempts/1/finish
-    AttemptController->>GradingService: calculateScore(attempt)
-    GradingService->>Database: Grade answers
-    Database-->>GradingService: Graded
-    GradingService->>Database: UPDATE quiz_attempts SET status='completed'
-    Database-->>GradingService: Updated
-    GradingService-->>AttemptController: Attempt completed
+    LoadWebhooks -->|No Webhooks| Response["200 OK<br/>{attempt with score}"]
+    LoadWebhooks -->|Has Webhooks| PreparePayload["WebhookService<br/>Prepare Payload<br/>{user, quiz, attempt, score}"]
     
-    AttemptController->>Database: SELECT * FROM webhooks<br/>WHERE quiz_id=1 AND event='quiz.completed'<br/>AND is_active=true
-    Database-->>AttemptController: Webhook configurations
+    PreparePayload --> GenSignature["Generate HMAC Signature<br/>using webhook.secret"]
+    GenSignature --> SendWebhook["POST to External URL<br/>Headers: X-Signature<br/>Body: {event, data}"]
     
-    loop For each webhook
-        AttemptController->>WebhookService: Trigger webhook
-        WebhookService->>WebhookService: Prepare payload<br/>{user, quiz, attempt, score}
-        WebhookService->>WebhookService: Generate HMAC signature<br/>using webhook.secret
-        WebhookService->>External System: POST webhook.url<br/>Headers: X-Signature<br/>Body: {event, data}
-        
-        alt Webhook success
-            External System-->>WebhookService: 200 OK
-            WebhookService->>Database: Log success
-        else Webhook failure
-            External System-->>WebhookService: 4xx/5xx Error
-            WebhookService->>Database: Log failure
-            WebhookService->>WebhookService: Queue retry
-        end
-    end
+    SendWebhook -->|Success 200| LogSuccess["Database<br/>Log webhook success"]
+    SendWebhook -->|Error 4xx/5xx| LogFailure["Database<br/>Log webhook failure"]
+    LogFailure --> QueueRetry["Queue Retry<br/>for failed webhook"]
     
-    AttemptController-->>Student: 200 {attempt with score}
+    LogSuccess --> Response
+    QueueRetry --> Response
+    
+    style Response fill:#90EE90
+    style LogSuccess fill:#90EE90
+    style LogFailure fill:#FFB6C1
 ```
 
 ### Role-Based Access Control Flow
