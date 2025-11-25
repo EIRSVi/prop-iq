@@ -958,155 +958,155 @@ Authorization: Bearer {admin_token}
 ```mermaid
 graph TB
     subgraph "User Registration"
-        RegStart["POST /api/v1/register"] --> RegValidate["Validate Input<br/>name, email, password"]
-        RegValidate --> RegCreate["Create User<br/>Hash Password"]
-        RegCreate --> RegDB["Save to Database<br/>users table"]
-        RegDB --> RegToken["Generate Token<br/>Sanctum"]
-        RegToken --> RegResponse["201 Created<br/>{access_token, user}"]
+        RegStart["<b>POST /api/v1/register</b>"] --> RegValidate["<b>Validate Input</b><br/>name, email, password"]
+        RegValidate --> RegCreate["<b>Create User</b><br/>Hash Password"]
+        RegCreate --> RegDB["<b>Save to Database</b><br/>users table"]
+        RegDB --> RegToken["<b>Generate Token</b><br/>Sanctum"]
+        RegToken --> RegResponse["<b>201 Created</b><br/>{access_token, user}"]
     end
     
     subgraph "User Login"
-        LoginStart["POST /api/v1/login"] --> LoginAuth["Verify Credentials<br/>email + password"]
-        LoginAuth -->|Valid| LoginToken["Generate Token<br/>Sanctum"]
-        LoginAuth -->|Invalid| LoginError["401 Unauthorized<br/>Invalid login details"]
-        LoginToken --> LoginResponse["200 OK<br/>{access_token, user}"]
+        LoginStart["<b>POST /api/v1/login</b>"] --> LoginAuth["<b>Verify Credentials</b><br/>email + password"]
+        LoginAuth -->|Valid| LoginToken["<b>Generate Token</b><br/>Sanctum"]
+        LoginAuth -->|Invalid| LoginError["<b>401 Unauthorized</b><br/>Invalid login details"]
+        LoginToken --> LoginResponse["<b>200 OK</b><br/>{access_token, user}"]
     end
     
     subgraph "Authenticated Request"
-        AuthReq["GET /api/v1/me<br/>Bearer token"] --> VerifyToken["Verify Token<br/>Sanctum Middleware"]
-        VerifyToken -->|Valid| GetUser["Fetch User Data"]
-        VerifyToken -->|Invalid| AuthError["401 Unauthorized"]
-        GetUser --> AuthResponse["200 OK<br/>{user}"]
+        AuthReq["<b>GET /api/v1/me</b><br/>Bearer token"] --> VerifyToken["<b>Verify Token</b><br/>Sanctum Middleware"]
+        VerifyToken -->|Valid| GetUser["<b>Fetch User Data</b>"]
+        VerifyToken -->|Invalid| AuthError["<b>401 Unauthorized</b>"]
+        GetUser --> AuthResponse["<b>200 OK</b><br/>{user}"]
     end
     
     subgraph "Logout"
-        LogoutReq["POST /api/v1/logout<br/>Bearer token"] --> LogoutVerify["Verify Token"]
-        LogoutVerify --> LogoutDelete["Delete Token<br/>personal_access_tokens"]
-        LogoutDelete --> LogoutResponse["200 OK<br/>Logged out successfully"]
+        LogoutReq["<b>POST /api/v1/logout</b><br/>Bearer token"] --> LogoutVerify["<b>Verify Token</b>"]
+        LogoutVerify --> LogoutDelete["<b>Delete Token</b><br/>personal_access_tokens"]
+        LogoutDelete --> LogoutResponse["<b>200 OK</b><br/>Logged out successfully"]
     end
     
-    style RegResponse fill:#90EE90
-    style LoginResponse fill:#90EE90
-    style AuthResponse fill:#90EE90
-    style LogoutResponse fill:#90EE90
-    style LoginError fill:#FFB6C1
-    style AuthError fill:#FFB6C1
+    style RegResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LoginResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style AuthResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LogoutResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LoginError fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
+    style AuthError fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Quiz Creation Flow
 
 ```mermaid
 graph TB
-    Start["Teacher: POST /api/v1/quizzes"] --> Auth["Verify Auth Token<br/>Sanctum"]
-    Auth --> Validate["Validate Quiz Data<br/>title, type, settings"]
-    Validate --> CreateQuiz["QuizService<br/>Create Quiz"]
-    CreateQuiz --> SaveQuiz["Database<br/>INSERT INTO quizzes"]
-    SaveQuiz --> GenSlug["Generate Unique Slug"]
-    GenSlug --> CreateSettings["Create Quiz Settings<br/>time_limit, passing_score"]
-    CreateSettings --> SaveSettings["Database<br/>INSERT INTO quiz_settings"]
-    SaveSettings --> QuizResponse["201 Created<br/>{quiz, settings}"]
+    Start["<b>Teacher: POST /api/v1/quizzes</b>"] --> Auth["<b>Verify Auth Token</b><br/>Sanctum"]
+    Auth --> Validate["<b>Validate Quiz Data</b><br/>title, type, settings"]
+    Validate --> CreateQuiz["<b>QuizService</b><br/>Create Quiz"]
+    CreateQuiz --> SaveQuiz["<b>Database</b><br/>INSERT INTO quizzes"]
+    SaveQuiz --> GenSlug["<b>Generate Unique Slug</b>"]
+    GenSlug --> CreateSettings["<b>Create Quiz Settings</b><br/>time_limit, passing_score"]
+    CreateSettings --> SaveSettings["<b>Database</b><br/>INSERT INTO quiz_settings"]
+    SaveSettings --> QuizResponse["<b>201 Created</b><br/>{quiz, settings}"]
     
-    QuizResponse --> AddQ1["Teacher: POST /api/v1/quizzes/1/questions"]
-    AddQ1 --> ValidateQ1["Validate Question Data<br/>type, content, points"]
-    ValidateQ1 --> CreateQ1["Create Question"]
-    CreateQ1 --> SaveQ1["Database<br/>INSERT INTO questions"]
-    SaveQ1 --> CreateOpts["Create Options<br/>Loop through options"]
-    CreateOpts --> SaveOpts["Database<br/>INSERT INTO question_options"]
-    SaveOpts --> Q1Response["201 Created<br/>{question, options}"]
+    QuizResponse --> AddQ1["<b>Teacher: POST /api/v1/quizzes/1/questions</b>"]
+    AddQ1 --> ValidateQ1["<b>Validate Question Data</b><br/>type, content, points"]
+    ValidateQ1 --> CreateQ1["<b>Create Question</b>"]
+    CreateQ1 --> SaveQ1["<b>Database</b><br/>INSERT INTO questions"]
+    SaveQ1 --> CreateOpts["<b>Create Options</b><br/>Loop through options"]
+    CreateOpts --> SaveOpts["<b>Database</b><br/>INSERT INTO question_options"]
+    SaveOpts --> Q1Response["<b>201 Created</b><br/>{question, options}"]
     
-    Q1Response --> AddQ2["Teacher: Add More Questions"]
-    AddQ2 --> Q2Response["201 Created<br/>{question, options}"]
+    Q1Response --> AddQ2["<b>Teacher: Add More Questions</b>"]
+    AddQ2 --> Q2Response["<b>201 Created</b><br/>{question, options}"]
     
-    Q2Response --> Publish["Teacher: PUT /api/v1/quizzes/1<br/>status=published"]
-    Publish --> AuthCheck["Authorize<br/>Owner or Admin"]
-    AuthCheck -->|Authorized| UpdateStatus["Database<br/>UPDATE quizzes<br/>SET status='published'"]
-    AuthCheck -->|Unauthorized| Error403["403 Forbidden"]
-    UpdateStatus --> PublishResponse["200 OK<br/>{quiz}"]
+    Q2Response --> Publish["<b>Teacher: PUT /api/v1/quizzes/1</b><br/>status=published"]
+    Publish --> AuthCheck["<b>Authorize</b><br/>Owner or Admin"]
+    AuthCheck -->|Authorized| UpdateStatus["<b>Database</b><br/>UPDATE quizzes<br/>SET status='published'"]
+    AuthCheck -->|Unauthorized| Error403["<b>403 Forbidden</b>"]
+    UpdateStatus --> PublishResponse["<b>200 OK</b><br/>{quiz}"]
     
-    style QuizResponse fill:#90EE90
-    style Q1Response fill:#90EE90
-    style Q2Response fill:#90EE90
-    style PublishResponse fill:#90EE90
-    style Error403 fill:#FFB6C1
+    style QuizResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Q1Response fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Q2Response fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style PublishResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Error403 fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Quiz Taking Flow
 
 ```mermaid
 graph TB
-    Start["Student: POST /api/v1/quizzes/1/start"] --> Auth["Verify Auth Token"]
-    Auth --> LoadQuiz["Load Quiz Data<br/>quizzes + quiz_settings"]
-    LoadQuiz --> CheckStatus["Check Quiz Status<br/>published?"]
-    CheckStatus --> CheckDates["Check Dates<br/>start_at, end_at"]
-    CheckDates --> CheckAccess["Check Access Mode<br/>public/private/password"]
+    Start["<b>Student: POST /api/v1/quizzes/1/start</b>"] --> Auth["<b>Verify Auth Token</b>"]
+    Auth --> LoadQuiz["<b>Load Quiz Data</b><br/>quizzes + quiz_settings"]
+    LoadQuiz --> CheckStatus["<b>Check Quiz Status</b><br/>published?"]
+    CheckStatus --> CheckDates["<b>Check Dates</b><br/>start_at, end_at"]
+    CheckDates --> CheckAccess["<b>Check Access Mode</b><br/>public/private/password"]
     
-    CheckAccess -->|Access Denied| Error403["403/404<br/>Access Denied"]
-    CheckAccess -->|Access Granted| CreateAttempt["Create Quiz Attempt<br/>status=in_progress"]
-    CreateAttempt --> SaveAttempt["Database<br/>INSERT INTO quiz_attempts"]
-    SaveAttempt --> StartResponse["201 Created<br/>{attempt_id, start_time}"]
+    CheckAccess -->|Access Denied| Error403["<b>403/404</b><br/>Access Denied"]
+    CheckAccess -->|Access Granted| CreateAttempt["<b>Create Quiz Attempt</b><br/>status=in_progress"]
+    CreateAttempt --> SaveAttempt["<b>Database</b><br/>INSERT INTO quiz_attempts"]
+    SaveAttempt --> StartResponse["<b>201 Created</b><br/>{attempt_id, start_time}"]
     
-    StartResponse --> SubmitA1["Student: POST /api/v1/attempts/1/submit<br/>question_id, option_id"]
-    SubmitA1 --> VerifyAttempt["Verify Ownership<br/>& Status"]
-    VerifyAttempt --> ValidateQ["Validate Question<br/>belongs to quiz"]
-    ValidateQ --> SaveAnswer1["Database<br/>INSERT/UPDATE question_answers"]
-    SaveAnswer1 --> Answer1Response["200 OK<br/>{answer}"]
+    StartResponse --> SubmitA1["<b>Student: POST /api/v1/attempts/1/submit</b><br/>question_id, option_id"]
+    SubmitA1 --> VerifyAttempt["<b>Verify Ownership</b><br/>& Status"]
+    VerifyAttempt --> ValidateQ["<b>Validate Question</b><br/>belongs to quiz"]
+    ValidateQ --> SaveAnswer1["<b>Database</b><br/>INSERT/UPDATE question_answers"]
+    SaveAnswer1 --> Answer1Response["<b>200 OK</b><br/>{answer}"]
     
-    Answer1Response --> SubmitA2["Student: Submit More Answers"]
-    SubmitA2 --> SaveAnswer2["Database<br/>UPDATE question_answers"]
-    SaveAnswer2 --> Answer2Response["200 OK"]
+    Answer1Response --> SubmitA2["<b>Student: Submit More Answers</b>"]
+    SubmitA2 --> SaveAnswer2["<b>Database</b><br/>UPDATE question_answers"]
+    SaveAnswer2 --> Answer2Response["<b>200 OK</b>"]
     
-    Answer2Response --> Finish["Student: POST /api/v1/attempts/1/finish"]
-    Finish --> SetEndTime["Set end_time=now()"]
-    SetEndTime --> StartGrading["GradingService<br/>calculateScore()"]
-    StartGrading --> LoadAnswers["Load All Answers<br/>with Questions"]
-    LoadAnswers --> CheckCorrect["Check Each Answer<br/>is_correct?"]
-    CheckCorrect --> CalcPoints["Calculate Points<br/>points_awarded"]
-    CalcPoints --> UpdateAnswers["Database<br/>UPDATE question_answers"]
-    UpdateAnswers --> SumScore["Sum Total Score"]
-    SumScore --> UpdateAttempt["Database<br/>UPDATE quiz_attempts<br/>score, status=completed"]
-    UpdateAttempt --> FinishResponse["200 OK<br/>{score, status=completed}"]
+    Answer2Response --> Finish["<b>Student: POST /api/v1/attempts/1/finish</b>"]
+    Finish --> SetEndTime["<b>Set end_time=now()</b>"]
+    SetEndTime --> StartGrading["<b>GradingService</b><br/>calculateScore()"]
+    StartGrading --> LoadAnswers["<b>Load All Answers</b><br/>with Questions"]
+    LoadAnswers --> CheckCorrect["<b>Check Each Answer</b><br/>is_correct?"]
+    CheckCorrect --> CalcPoints["<b>Calculate Points</b><br/>points_awarded"]
+    CalcPoints --> UpdateAnswers["<b>Database</b><br/>UPDATE question_answers"]
+    UpdateAnswers --> SumScore["<b>Sum Total Score</b>"]
+    SumScore --> UpdateAttempt["<b>Database</b><br/>UPDATE quiz_attempts<br/>score, status=completed"]
+    UpdateAttempt --> FinishResponse["<b>200 OK</b><br/>{score, status=completed}"]
     
-    style StartResponse fill:#90EE90
-    style Answer1Response fill:#90EE90
-    style Answer2Response fill:#90EE90
-    style FinishResponse fill:#90EE90
-    style Error403 fill:#FFB6C1
+    style StartResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Answer1Response fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Answer2Response fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style FinishResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Error403 fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Certificate Generation Flow
 
 ```mermaid
 graph TB
-    Start["Student: POST /api/v1/attempts/1/certificate"] --> VerifyAuth["Verify Auth Token"]
-    VerifyAuth --> LoadAttempt["Load Quiz Attempt<br/>from Database"]
-    LoadAttempt --> CheckOwner["Verify User<br/>Owns Attempt"]
-    CheckOwner --> CheckComplete["Check Status<br/>completed?"]
+    Start["<b>Student: POST /api/v1/attempts/1/certificate</b>"] --> VerifyAuth["<b>Verify Auth Token</b>"]
+    VerifyAuth --> LoadAttempt["<b>Load Quiz Attempt</b><br/>from Database"]
+    LoadAttempt --> CheckOwner["<b>Verify User</b><br/>Owns Attempt"]
+    CheckOwner --> CheckComplete["<b>Check Status</b><br/>completed?"]
     
-    CheckComplete -->|Not Completed| Error400A["400 Bad Request<br/>Quiz not completed"]
-    CheckComplete -->|Completed| CheckExisting["Check Existing<br/>Certificate"]
+    CheckComplete -->|Not Completed| Error400A["<b>400 Bad Request</b><br/>Quiz not completed"]
+    CheckComplete -->|Completed| CheckExisting["<b>Check Existing</b><br/>Certificate"]
     
-    CheckExisting -->|Exists| ReturnExisting["200 OK<br/>{existing certificate}"]
-    CheckExisting -->|Not Exists| LoadSettings["Load Quiz Settings<br/>passing_score"]
+    CheckExisting -->|Exists| ReturnExisting["<b>200 OK</b><br/>{existing certificate}"]
+    CheckExisting -->|Not Exists| LoadSettings["<b>Load Quiz Settings</b><br/>passing_score"]
     
-    LoadSettings --> CompareScore["Compare Score<br/>score >= passing_score?"]
-    CompareScore -->|Failed| Error400B["400 Bad Request<br/>Did not meet passing criteria"]
-    CompareScore -->|Passed| GenCode["Generate Unique Code<br/>CERT-XXXXXX"]
+    LoadSettings --> CompareScore["<b>Compare Score</b><br/>score >= passing_score?"]
+    CompareScore -->|Failed| Error400B["<b>400 Bad Request</b><br/>Did not meet passing criteria"]
+    CompareScore -->|Passed| GenCode["<b>Generate Unique Code</b><br/>CERT-XXXXXX"]
     
-    GenCode --> CreateCert["Create Certificate<br/>CertificateService"]
-    CreateCert --> SaveCert["Database<br/>INSERT INTO certificates"]
-    SaveCert --> CertResponse["201 Created<br/>{certificate_code, score, issued_at}"]
+    GenCode --> CreateCert["<b>Create Certificate</b><br/>CertificateService"]
+    CreateCert --> SaveCert["<b>Database</b><br/>INSERT INTO certificates"]
+    SaveCert --> CertResponse["<b>201 Created</b><br/>{certificate_code, score, issued_at}"]
     
-    CertResponse --> Verify["Anyone: GET /api/v1/certificates/verify/CODE"]
-    Verify --> SearchCert["Database<br/>SELECT certificate<br/>WHERE certificate_code"]
-    SearchCert -->|Not Found| Error404["404 Not Found<br/>Certificate not found"]
-    SearchCert -->|Found| VerifyResponse["200 OK<br/>{certificate, user, quiz}"]
+    CertResponse --> Verify["<b>Anyone: GET /api/v1/certificates/verify/CODE</b>"]
+    Verify --> SearchCert["<b>Database</b><br/>SELECT certificate<br/>WHERE certificate_code"]
+    SearchCert -->|Not Found| Error404["<b>404 Not Found</b><br/>Certificate not found"]
+    SearchCert -->|Found| VerifyResponse["<b>200 OK</b><br/>{certificate, user, quiz}"]
     
-    style ReturnExisting fill:#87CEEB
-    style CertResponse fill:#90EE90
-    style VerifyResponse fill:#90EE90
-    style Error400A fill:#FFB6C1
-    style Error400B fill:#FFB6C1
-    style Error404 fill:#FFB6C1
+    style ReturnExisting fill:#1f6feb,stroke:#58a6ff,stroke-width:2px,color:#fff
+    style CertResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style VerifyResponse fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style Error400A fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
+    style Error400B fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
+    style Error404 fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Leaderboard & Analytics Flow
@@ -1114,57 +1114,57 @@ graph TB
 ```mermaid
 graph TB
     subgraph "Leaderboard"
-        LB1["User: GET /api/v1/quizzes/1/leaderboard"] --> LB2["Verify Auth Token"]
-        LB2 --> LB3["Load Quiz Settings<br/>show_results"]
-        LB3 -->|Hidden| LB4["403 Forbidden<br/>Leaderboard hidden"]
-        LB3 -->|Visible| LB5["Database<br/>SELECT quiz_attempts<br/>WHERE status=completed<br/>ORDER BY score DESC"]
-        LB5 --> LB6["Map Each Attempt<br/>user, score, completed_at"]
-        LB6 --> LB7["Assign Ranks<br/>1, 2, 3..."]
-        LB7 --> LB8["200 OK<br/>{rank, user, score, completed_at}"]
+        LB1["<b>User: GET /api/v1/quizzes/1/leaderboard</b>"] --> LB2["<b>Verify Auth Token</b>"]
+        LB2 --> LB3["<b>Load Quiz Settings</b><br/>show_results"]
+        LB3 -->|Hidden| LB4["<b>403 Forbidden</b><br/>Leaderboard hidden"]
+        LB3 -->|Visible| LB5["<b>Database</b><br/>SELECT quiz_attempts<br/>WHERE status=completed<br/>ORDER BY score DESC"]
+        LB5 --> LB6["<b>Map Each Attempt</b><br/>user, score, completed_at"]
+        LB6 --> LB7["<b>Assign Ranks</b><br/>1, 2, 3..."]
+        LB7 --> LB8["<b>200 OK</b><br/>{rank, user, score, completed_at}"]
     end
     
     subgraph "Quiz Statistics"
-        ST1["Teacher/Admin: GET /api/v1/quizzes/1/stats"] --> ST2["Verify Auth Token"]
-        ST2 --> ST3["Authorize<br/>Author or Admin?"]
-        ST3 -->|Unauthorized| ST4["403 Forbidden<br/>Unauthorized"]
-        ST3 -->|Authorized| ST5["Database<br/>SELECT quiz_attempts<br/>WHERE status=completed"]
-        ST5 --> ST6["Calculate Statistics<br/>total, avg, max, min"]
-        ST6 --> ST7["Load passing_score<br/>from quiz_settings"]
-        ST7 --> ST8["Count Passed Attempts<br/>score >= passing_score"]
-        ST8 --> ST9["Calculate Pass Rate<br/>percentage"]
-        ST9 --> ST10["200 OK<br/>{total_attempts, average_score,<br/>highest_score, lowest_score, pass_rate}"]
+        ST1["<b>Teacher/Admin: GET /api/v1/quizzes/1/stats</b>"] --> ST2["<b>Verify Auth Token</b>"]
+        ST2 --> ST3["<b>Authorize</b><br/>Author or Admin?"]
+        ST3 -->|Unauthorized| ST4["<b>403 Forbidden</b><br/>Unauthorized"]
+        ST3 -->|Authorized| ST5["<b>Database</b><br/>SELECT quiz_attempts<br/>WHERE status=completed"]
+        ST5 --> ST6["<b>Calculate Statistics</b><br/>total, avg, max, min"]
+        ST6 --> ST7["<b>Load passing_score</b><br/>from quiz_settings"]
+        ST7 --> ST8["<b>Count Passed Attempts</b><br/>score >= passing_score"]
+        ST8 --> ST9["<b>Calculate Pass Rate</b><br/>percentage"]
+        ST9 --> ST10["<b>200 OK</b><br/>{total_attempts, average_score,<br/>highest_score, lowest_score, pass_rate}"]
     end
     
-    style LB8 fill:#90EE90
-    style ST10 fill:#90EE90
-    style LB4 fill:#FFB6C1
-    style ST4 fill:#FFB6C1
+    style LB8 fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style ST10 fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LB4 fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
+    style ST4 fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Webhook Flow
 
 ```mermaid
 graph TB
-    Start["Student: POST /api/v1/attempts/1/finish"] --> Grade["GradingService<br/>calculateScore()"]
-    Grade --> UpdateDB["Database<br/>UPDATE quiz_attempts<br/>SET status=completed, score"]
-    UpdateDB --> LoadWebhooks["Database<br/>SELECT webhooks<br/>WHERE quiz_id AND event=quiz.completed<br/>AND is_active=true"]
+    Start["<b>Student: POST /api/v1/attempts/1/finish</b>"] --> Grade["<b>GradingService</b><br/>calculateScore()"]
+    Grade --> UpdateDB["<b>Database</b><br/>UPDATE quiz_attempts<br/>SET status=completed, score"]
+    UpdateDB --> LoadWebhooks["<b>Database</b><br/>SELECT webhooks<br/>WHERE quiz_id AND event=quiz.completed<br/>AND is_active=true"]
     
-    LoadWebhooks -->|No Webhooks| Response["200 OK<br/>{attempt with score}"]
-    LoadWebhooks -->|Has Webhooks| PreparePayload["WebhookService<br/>Prepare Payload<br/>{user, quiz, attempt, score}"]
+    LoadWebhooks -->|No Webhooks| Response["<b>200 OK</b><br/>{attempt with score}"]
+    LoadWebhooks -->|Has Webhooks| PreparePayload["<b>WebhookService</b><br/>Prepare Payload<br/>{user, quiz, attempt, score}"]
     
-    PreparePayload --> GenSignature["Generate HMAC Signature<br/>using webhook.secret"]
-    GenSignature --> SendWebhook["POST to External URL<br/>Headers: X-Signature<br/>Body: {event, data}"]
+    PreparePayload --> GenSignature["<b>Generate HMAC Signature</b><br/>using webhook.secret"]
+    GenSignature --> SendWebhook["<b>POST to External URL</b><br/>Headers: X-Signature<br/>Body: {event, data}"]
     
-    SendWebhook -->|Success 200| LogSuccess["Database<br/>Log webhook success"]
-    SendWebhook -->|Error 4xx/5xx| LogFailure["Database<br/>Log webhook failure"]
-    LogFailure --> QueueRetry["Queue Retry<br/>for failed webhook"]
+    SendWebhook -->|Success 200| LogSuccess["<b>Database</b><br/>Log webhook success"]
+    SendWebhook -->|Error 4xx/5xx| LogFailure["<b>Database</b><br/>Log webhook failure"]
+    LogFailure --> QueueRetry["<b>Queue Retry</b><br/>for failed webhook"]
     
     LogSuccess --> Response
     QueueRetry --> Response
     
-    style Response fill:#90EE90
-    style LogSuccess fill:#90EE90
-    style LogFailure fill:#FFB6C1
+    style Response fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LogSuccess fill:#238636,stroke:#2ea043,stroke-width:2px,color:#fff
+    style LogFailure fill:#da3633,stroke:#f85149,stroke-width:2px,color:#fff
 ```
 
 ### Role-Based Access Control Flow
